@@ -1,0 +1,117 @@
+:root {
+  --bg: #f4f5f9;
+  --card: #ffffff;
+  --ink: #1d2033;
+  --muted: #6b6f86;
+  --line: #e4e6ef;
+  --brand: #4f5bd5;
+  --brand-soft: #eceefd;
+  --ok: #1f9d55;
+  --ok-soft: #e3f6ea;
+  --warn: #c27803;
+  --warn-soft: #fdf3dc;
+  --bad: #d64545;
+  --bad-soft: #fde8e8;
+  --radius: 16px;
+  font-family: 'Pretendard', system-ui, -apple-system, 'Segoe UI', 'Malgun Gothic', sans-serif;
+  color: var(--ink);
+  background: var(--bg);
+  -webkit-font-smoothing: antialiased;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); }
+h1, h2 { letter-spacing: -0.02em; }
+
+/* ---------- 공통 ---------- */
+.home, .try { max-width: 1120px; margin: 0 auto; padding: 32px 16px 48px; }
+.card { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 20px; box-shadow: 0 1px 2px rgba(20, 24, 60, 0.04); }
+.card h2 { font-size: 15px; margin: 0 0 12px; color: var(--muted); font-weight: 600; }
+.hint { font-size: 13px; color: var(--muted); line-height: 1.6; margin: 8px 0; }
+.muted { color: var(--muted); }
+.error { color: var(--bad); }
+
+button { font: inherit; }
+button.primary, button.ghost { font-size: 15px; font-weight: 600; padding: 10px 18px; border-radius: 10px; cursor: pointer; transition: background 0.15s, opacity 0.15s; }
+button.primary { border: 0; background: var(--brand); color: #fff; }
+button.primary:hover:not(:disabled) { background: #3f4bc4; }
+button.ghost { border: 1px solid var(--line); background: #fff; color: var(--ink); }
+button.ghost:hover:not(:disabled) { background: var(--bg); }
+button:disabled { opacity: 0.45; cursor: default; }
+button.wide { width: 100%; margin-top: 8px; }
+
+/* ---------- 머리말 ---------- */
+.page-head { margin-bottom: 24px; }
+.eyebrow { margin: 0 0 6px; font-size: 13px; font-weight: 600; color: var(--brand); }
+.page-head h1 { margin: 0; font-size: clamp(26px, 4vw, 36px); }
+.lede { margin: 10px 0 0; color: var(--muted); line-height: 1.6; max-width: 640px; }
+.steps { display: flex; flex-wrap: wrap; gap: 8px; list-style: none; padding: 0; margin: 18px 0 0; }
+.steps li { display: flex; align-items: center; gap: 8px; padding: 6px 12px 6px 6px; border-radius: 999px; background: var(--card); border: 1px solid var(--line); font-size: 14px; color: var(--muted); }
+.steps li span { display: grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; background: var(--bg); font-size: 12px; font-weight: 700; }
+.steps li.on { border-color: var(--brand); color: var(--ink); font-weight: 600; }
+.steps li.on span { background: var(--brand); color: #fff; }
+.steps li.done span { background: var(--ok-soft); color: var(--ok); }
+
+/* ---------- 본문: 카메라 | 오른쪽 카드 ---------- */
+.layout { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 16px; align-items: start; }
+.side { display: flex; flex-direction: column; gap: 16px; }
+@media (max-width: 860px) { .layout { grid-template-columns: 1fr; } }
+
+.stage-wrap { position: relative; }
+/* 미리보기 무대: 비율은 TryPage가 실제 영상 비율로 덮어씀 */
+.stage { position: relative; width: 100%; aspect-ratio: 4 / 3; background: #111; border-radius: 12px; overflow: hidden; }
+.stage video, .stage canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+/* 거울처럼 보이게 — 화면에 그리는 모습만 뒤집고, 영상 데이터와 점 좌표는 그대로 */
+.stage.mirrored { transform: scaleX(-1); }
+.pill { position: absolute; top: 12px; left: 12px; padding: 5px 12px; border-radius: 999px; font-size: 13px; font-weight: 600; backdrop-filter: blur(6px); }
+.pill.ok { background: rgba(227, 246, 234, 0.92); color: var(--ok); }
+.pill.warn { background: rgba(253, 243, 220, 0.92); color: var(--warn); }
+
+.gaze-value { margin: 0; font-size: 18px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.gaze-value b { font-size: 30px; color: var(--ink); }
+.gaze-value small { font-size: 14px; }
+
+.quality { display: flex; align-items: center; gap: 10px; margin: 0; font-size: 20px; font-weight: 700; }
+.badge { font-size: 12px; font-weight: 700; padding: 4px 10px; border-radius: 999px; }
+.q-good .badge { background: var(--ok-soft); color: var(--ok); }
+.q-fair .badge { background: var(--warn-soft); color: var(--warn); }
+.q-poor .badge { background: var(--bad-soft); color: var(--bad); }
+
+/* ---------- 보정 후 내 시선 점 (창 기준 좌표) ---------- */
+.gaze-dot { position: fixed; left: 0; top: 0; z-index: 90; width: 40px; height: 40px; margin: -20px 0 0 -20px; border-radius: 50%; background: rgba(79, 91, 213, 0.35); border: 3px solid var(--brand); pointer-events: none; transition: transform 300ms ease-out; }
+.gaze-dot.low { border-style: dashed; background: rgba(79, 91, 213, 0.2); }
+.gaze-dot span { position: absolute; top: 44px; left: 50%; transform: translateX(-50%); white-space: nowrap; font-size: 12px; font-weight: 600; color: var(--bad); background: #fff; padding: 2px 8px; border-radius: 999px; box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12); }
+
+/* ---------- 보정 화면: 창 전체를 덮음. 점 좌표 = 이 화면 기준 CSS px ---------- */
+.calib { position: fixed; inset: 0; z-index: 100; background: #fbfbfd; overflow: hidden; }
+.calib-panel { max-width: 520px; margin: 18vh auto 0; padding: 0 16px; }
+.calib-panel h2 { margin: 0 0 12px; font-size: 24px; }
+.calib-panel p { color: var(--muted); line-height: 1.6; }
+.calib-big { font-size: 26px; font-weight: 700; color: var(--brand) !important; }
+.calib-row { display: flex; gap: 12px; margin-top: 16px; }
+.calib-guide { position: absolute; top: 16px; left: 0; right: 0; text-align: center; color: var(--muted); margin: 0; pointer-events: none; }
+/* 점 중심 = translate 위치 (margin 으로 반지름만큼 당김) */
+.calib-dot { position: absolute; left: 0; top: 0; width: 24px; height: 24px; margin: -12px 0 0 -12px; pointer-events: none; }
+.calib-dot span { display: block; width: 100%; height: 100%; border-radius: 50%; background: #e5484d; box-shadow: 0 0 0 6px rgba(229, 72, 77, 0.2); animation-name: calib-pop; animation-timing-function: ease-out; }
+@keyframes calib-pop { 40% { transform: scale(1.7); } 100% { transform: scale(1); } }
+
+/* ---------- 개발자 정보 (접힘) ---------- */
+.dev { margin-top: 24px; }
+.dev summary { cursor: pointer; font-weight: 600; color: var(--muted); }
+.dev[open] summary { margin-bottom: 12px; }
+.eyes { display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-start; margin: 12px 0; }
+.eyes figure { margin: 0; text-align: center; font-size: 12px; color: var(--muted); }
+/* 64px 크롭을 크게, 픽셀이 뭉개지지 않게 */
+.eyes canvas { width: 128px; height: 128px; image-rendering: pixelated; background: #000; border-radius: 8px; display: block; }
+.eyes p { margin: 4px 0 8px; }
+.debug { font-size: 13px; color: #444; }
+.debug p { margin: 4px 0; }
+.matrix { margin: 4px 0; font-size: 12px; background: var(--bg); padding: 8px; border-radius: 8px; display: inline-block; }
+.compare { margin-top: 16px; padding-top: 12px; border-top: 1px dashed var(--line); }
+.compare table { border-collapse: collapse; font-size: 13px; font-variant-numeric: tabular-nums; }
+.compare th, .compare td { border: 1px solid var(--line); padding: 4px 8px; text-align: left; }
+
+/* ---------- 첫 화면 ---------- */
+.home { min-height: 80vh; display: flex; flex-direction: column; justify-content: center; }
+.home .lede { font-size: 17px; }
+.home a.primary { display: inline-block; margin-top: 24px; padding: 14px 24px; border-radius: 12px; background: var(--brand); color: #fff; font-weight: 600; text-decoration: none; align-self: flex-start; }
+.home a.primary:hover { background: #3f4bc4; }

@@ -1,0 +1,16 @@
+node_modules/
+dist/
+*.local
+
+# scripts/copy-assets.mjs 가 만드는 복사본 (원본: node_modules, reference/)
+public/mediapipe/
+public/models/
+
+# 수집 데이터 (눈 크롭, 라벨) — Git에 올리지 않음
+data/
+collected/
+    
+public/litert/
+__pycache__/
+.env
+.env.*

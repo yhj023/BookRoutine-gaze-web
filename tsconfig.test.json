@@ -1,0 +1,9 @@
+{
+  "//": "테스트 파일만 Node 타입(node:fs 등)을 쓸 수 있게. 앱 코드는 tsconfig.json (Node 타입 없음)",
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "types": ["vite/client", "node"]
+  },
+  "include": ["src"],
+  "exclude": []
+}
