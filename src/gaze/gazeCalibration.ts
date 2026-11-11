@@ -38,6 +38,9 @@ export interface GazeObs {
   gaze: Pt; // 모델 출력 (cm)
   yaw: number | null;
   pitch: number | null;
+  /** (웹에서 추가) eyeBlink 블렌드셰이프 0~1 — 눈 감음 기준을 사람마다 정하는 데 씀 */
+  blinkLeft?: number | null;
+  blinkRight?: number | null;
 }
 
 /** 점 하나를 보는 동안 모은 값 */
@@ -67,6 +70,11 @@ export interface GazeCalibration {
   quality: CalibrationQuality;
   /** 가운데 점을 볼 때의 고개 각도 — 고개 판정 기준 */
   head: { yaw: number; pitch: number };
+  /**
+   * (웹에서 추가) 보정하는 동안(점 5개 + 가운데 응시, 안정된 값만) 잰 eyeBlink 값들 (두 눈 모두).
+   * 집중 판정이 이걸로 "이 사람이 눈을 떴을 때" 값을 알아 눈 감음 기준을 정함 (FocusJudge)
+   */
+  eyeBlinkSamples: number[];
   /** 화면에 보여 줄 한 줄 설명 */
   summary: string;
 }
@@ -143,9 +151,13 @@ export function computeCalibration(
   const yaws = fixObs.map((o) => o.yaw).filter((v): v is number => v != null);
   const pitches = fixObs.map((o) => o.pitch).filter((v): v is number => v != null);
   const head = { yaw: yaws.length ? median(yaws) : 0, pitch: pitches.length ? median(pitches) : 0 };
+  // 눈 감음 기준용: 보정 내내(안정된 값) 잰 eyeBlink
+  const eyeBlinkSamples = [...points.flatMap(settled), ...fixObs]
+    .flatMap((o) => [o.blinkLeft, o.blinkRight])
+    .filter((v): v is number => v != null);
 
   const fail = (summary: string): GazeCalibration => ({
-    screen, map: null, fittedMap: null, errorPx: Infinity, errorCm: Infinity, noisePx: 0, quality: 'poor', head, summary,
+    screen, map: null, fittedMap: null, errorPx: Infinity, errorCm: Infinity, noisePx: 0, quality: 'poor', head, eyeBlinkSamples, summary,
   });
 
   // 점마다 대표값(중앙값) — 튀는 값에 강함
@@ -192,6 +204,7 @@ export function computeCalibration(
     noisePx,
     quality,
     head,
+    eyeBlinkSamples,
     summary:
       quality === 'poor'
         ? `시선 오차 ${errorCm.toFixed(1)}cm — 고개 방향 위주로 측정해요`

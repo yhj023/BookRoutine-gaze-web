@@ -38,7 +38,7 @@ async function createLandmarker(): Promise<FaceLandmarker> {
   }
 }
 
-function blendshape(result: FaceLandmarkerResult, name: string): number | null {
+export function blendshape(result: FaceLandmarkerResult, name: string): number | null {
   const c = result.faceBlendshapes[0]?.categories.find((x) => x.categoryName === name);
   return c ? c.score : null;
 }

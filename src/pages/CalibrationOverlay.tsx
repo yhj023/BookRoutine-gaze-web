@@ -84,7 +84,16 @@ export default function CalibrationOverlay({ hub, onDone }: Props) {
       hub.subscribe((s) => {
         setFaceOk(s.faceDetected && s.gaze != null);
         const cur = currentRef.current;
-        if (cur && s.faceDetected && s.gaze) cur.obs.push({ t: s.timestamp, gaze: s.gaze, yaw: s.yaw, pitch: s.pitch });
+        if (cur && s.faceDetected && s.gaze) {
+          cur.obs.push({
+            t: s.timestamp,
+            gaze: s.gaze,
+            yaw: s.yaw,
+            pitch: s.pitch,
+            blinkLeft: s.leftEyeOpen == null ? null : 1 - s.leftEyeOpen,
+            blinkRight: s.rightEyeOpen == null ? null : 1 - s.rightEyeOpen,
+          });
+        }
       }),
     [hub],
   );
